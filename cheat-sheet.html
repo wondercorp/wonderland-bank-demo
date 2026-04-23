@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Presenter Cheat Sheet — Wonderland Bank Demo</title>
+<style>
+  @page { size: A4; margin: 12mm; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    color: #1a1a2e;
+    background: #f4f1f8;
+    font-size: 11.5px;
+    line-height: 1.4;
+  }
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 28px;
+    background: #fff;
+  }
+  @media screen {
+    .page { box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: 20px; margin-bottom: 20px; border-radius: 6px; }
+    body { padding: 0; }
+  }
+  @media print {
+    body { background: #fff; font-size: 10px; }
+    .no-print { display: none !important; }
+    .page { box-shadow: none; padding: 0; }
+  }
+
+  h1 { margin: 0 0 4px; font-size: 20px; color: #6b2d8c; }
+  .sub { color: #666; margin: 0 0 14px; font-size: 12px; }
+
+  .top-bar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    border-bottom: 2px solid #6b2d8c;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+  .logo-tiny {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ff9ed5, #e91e88 55%, #6b2d8c);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .card {
+    border: 1px solid #d8cce5;
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #fafafa;
+  }
+  .card h2 {
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: #6b2d8c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e0d5eb;
+    padding-bottom: 4px;
+  }
+
+  /* URLs */
+  .urls {
+    display: grid;
+    grid-template-columns: 90px 1fr 90px;
+    gap: 4px 10px;
+    font-size: 10.5px;
+  }
+  .urls .lbl { font-weight: 700; }
+  .urls .val { font-family: "Consolas", monospace; word-break: break-all; }
+  .urls .creds { font-family: "Consolas", monospace; color: #c2185b; font-weight: 600; }
+  .urls .row { display: contents; }
+  .urls .sep { grid-column: 1 / -1; height: 1px; background: #e0d5eb; margin: 2px 0; }
+
+  /* Timeline */
+  .beats { font-size: 10.5px; }
+  .beat {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px dotted #e0d5eb;
+  }
+  .beat:last-child { border-bottom: none; }
+  .beat .min {
+    font-weight: 700;
+    color: #6b2d8c;
+    text-align: right;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+  }
+  .beat .what b { display: block; margin-bottom: 1px; font-size: 11px; }
+  .beat .what .say { color: #555; font-style: italic; }
+  .beat .what .do { color: #1565c0; font-size: 10px; margin-top: 1px; }
+
+  /* Talking points */
+  .points { font-size: 10.5px; }
+  .points li { margin-bottom: 6px; }
+  .points li b { color: #6b2d8c; }
+
+  /* Mismatches */
+  .mm-list { font-size: 10px; padding-left: 18px; }
+  .mm-list li { margin-bottom: 5px; }
+  .mm-list b { color: #c2185b; }
+
+  /* Footer strip */
+  .strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+    font-size: 10px;
+  }
+  .strip .box {
+    background: #6b2d8c;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+  }
+  .strip .box.alt { background: #1d6f42; }
+  .strip .box.alt2 { background: #1565c0; }
+  .strip .box b { display: block; font-size: 11px; margin-bottom: 2px; }
+
+  .keyboard {
+    background: #f0e8f5;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-top: 6px;
+    font-size: 10px;
+    font-family: "Consolas", monospace;
+    color: #4a1e63;
+  }
+
+  .panic {
+    background: #fff4e5;
+    border-left: 3px solid #e67700;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    margin-top: 8px;
+  }
+  .panic b { color: #c77700; }
+
+  .print-btn {
+    position: fixed;
+    top: 16px; right: 16px;
+    background: #6b2d8c; color: #fff;
+    border: none; padding: 10px 18px;
+    border-radius: 6px; font-size: 13px;
+    cursor: pointer; font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-family: inherit;
+  }
+  .print-btn:hover { background: #4a1e63; }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨 Print / Save PDF</button>
+
+<div class="page">
+
+  <div class="top-bar">
+    <div>
+      <h1>Wonderland Bank — Presenter Cheat Sheet</h1>
+      <p class="sub">Bank reconciliation demo · Cheshire Cat agent · ~15 minutes</p>
+    </div>
+    <div class="logo-tiny"></div>
+  </div>
+
+  <div class="grid">
+
+    <!-- ============ LEFT COLUMN: Run-of-show ============ -->
+    <div>
+      <div class="card">
+        <h2>Run-of-show (15 min)</h2>
+        <div class="beats">
+          <div class="beat">
+            <div class="min">0:00<br>2 min</div>
+            <div class="what">
+              <b>1. "This is Alice at 11 AM"</b>
+              <div class="say">"Does your bank have mornings like this?"</div>
+              <div class="do">→ Show Alice's xlsx (before). Flip 4 tabs (3 systems + Excel). Land on Excel — 75 min of typing.</div>
+            </div>
+          </div>
+          <div class="beat">
+            <div class="min">2:00<br>1 min</div>
+            <div class="what">
+              <b>2. "Why couldn't this be automated?"</b>
+              <div class="say">"No mainframe API. No portal API. RPA broke when the portal redesigned. Only D365 has an API."</div>
+              <div class="do">→ Click ⟨/⟩ <b>API view</b> on System B. "One out of three is not integration."</div>
+            </div>
+          </div>
+          <div class="beat">
+            <div class="min">3:00<br>30 sec</div>
+            <div class="what">
+              <b>3. "Meet Cheshire Cat"</b>
+              <div class="say">"Same job, configured in an afternoon — no code."</div>
+              <div class="do">→ Switch to RIGHT screen (Copilot Studio config). Show prompt + tools.</div>
+            </div>
+          </div>
+          <div class="beat">
+            <div class="min">3:30<br>5 min</div>
+            <div class="what">
+              <b>4. "Watch it run" 🌟 THE WOW</b>
+              <div class="say">"It's 8 AM. Alice isn't in yet."</div>
+              <div class="do">→ LEFT screen: open <b>agent-console.html</b>, hit <b>Play</b> (Space). Narrate as it goes — emphasise OCR step + portal login + API call. Run ends with Teams message + workbook.</div>
+            </div>
+          </div>
+          <div class="beat">
+            <div class="min">8:30<br>2 min</div>
+            <div class="what">
+              <b>5. "Here's what Alice sees with her coffee"</b>
+              <div class="say">"3 hours became 4 minutes. She reviews. She doesn't type."</div>
+              <div class="do">→ Click the workbook attachment in the Teams panel. Open <b>Mismatches</b> sheet. Read the 3 items aloud.</div>
+            </div>
+          </div>
+          <div class="beat">
+            <div class="min">10:30<br>2 min</div>
+            <div class="what">
+              <b>6. "Why Microsoft"</b>
+              <div class="say">Cloud PC keeps data inside · Intune manages the device · Entra ID controls access · Copilot Studio = no-code build.</div>
+              <div class="do">→ This is a slide, not a demo. Don't switch screens.</div>
+            </div>
+          </div>
+          <div class="beat">
+            <div class="min">12:30<br>2 min</div>
+            <div class="what">
+              <b>7. "Where else does this go"</b>
+              <div class="say">KYC · regulatory reporting · contract review · vendor onboarding. Anywhere there's a screen with no API.</div>
+              <div class="do">→ Land the message: "The work you gave up on automating — that's where the most hours are being spent."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panic">
+        <b>If something breaks:</b> the agent console is a scripted replay — it cannot fail mid-demo. If the live agent (Copilot Studio) breaks, just switch to <code>agent-console.html</code> and call it the "playback view." Audience will not notice.
+      </div>
+    </div>
+
+    <!-- ============ RIGHT COLUMN: Reference ============ -->
+    <div>
+      <div class="card">
+        <h2>URLs &amp; credentials</h2>
+        <div class="urls">
+          <div class="row">
+            <span class="lbl">Landing</span>
+            <span class="val">wondercorp.github.io/wonderland-bank-demo/</span>
+            <span class="creds">—</span>
+          </div>
+          <div class="sep"></div>
+          <div class="row">
+            <span class="lbl">System A</span>
+            <span class="val">/system-a-mainframe.html<br><small>+ <code>#tran</code> to skip login</small></span>
+            <span class="creds">ALICE<br>WONDER85</span>
+          </div>
+          <div class="sep"></div>
+          <div class="row">
+            <span class="lbl">System B</span>
+            <span class="val">/system-b-dynamics.html<br><small>+ <code>#api</code> opens API panel</small></span>
+            <span class="creds">(SSO)</span>
+          </div>
+          <div class="sep"></div>
+          <div class="row">
+            <span class="lbl">System C</span>
+            <span class="val">/system-c-portal.html<br><small>+ <code>#dash</code> to skip login</small></span>
+            <span class="creds">cheshire123<br>(any email)</span>
+          </div>
+          <div class="sep"></div>
+          <div class="row">
+            <span class="lbl">Agent</span>
+            <span class="val">/agent-console.html</span>
+            <span class="creds">Space=play</span>
+          </div>
+          <div class="sep"></div>
+          <div class="row">
+            <span class="lbl">Before</span>
+            <span class="val">/alice_reconciliation_2026-04-22.xlsx</span>
+            <span class="creds">—</span>
+          </div>
+          <div class="row">
+            <span class="lbl">After</span>
+            <span class="val">/cheshire_reconciliation_2026-04-22.xlsx</span>
+            <span class="creds">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:10px;">
+        <h2>The 3 mismatches (memorise)</h2>
+        <ul class="mm-list">
+          <li><b>#1 White Rabbit Courier</b> (C00019210) — 3 mainframe txns, 0 portal settlements. <i>Gateway routing failure.</i></li>
+          <li><b>#2 Cheshire Cat Ventures</b> (C00045011) — $7,800 settled on mainframe, HELD on portal. <i>Risk team must release before 15:00 UTC.</i></li>
+          <li><b>#3 Queen of Hearts</b> (C00028701) — D365 balance $500 above mainframe. <i>Stale sync; self-heals 09:00 UTC.</i></li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-top:10px;">
+        <h2>Differentiation lines</h2>
+        <ul class="points">
+          <li><b>vs UiPath / RPA:</b> "RPA replays clicks. The screen moves, RPA breaks. Agents <i>see</i> the screen and adapt."</li>
+          <li><b>vs ChatGPT computer use:</b> "Runs on a Cloud PC inside your tenant. Data never leaves. Intune-managed. Entra ID auth."</li>
+          <li><b>vs Copilot Chat:</b> "Copilot answers questions. Agents <i>do</i> the job."</li>
+        </ul>
+      </div>
+
+      <div class="strip">
+        <div class="box"><b>2 screens</b>Left: live demo<br>Right: Copilot Studio config</div>
+        <div class="box alt"><b>The wow line</b>"It read a green screen from 1985."</div>
+        <div class="box alt2"><b>The close</b>"You gave up on this. Not anymore."</div>
+      </div>
+
+      <div class="keyboard">
+        <b>Agent console keys:</b>  Space = play/pause · R = reset · → = step forward · Speed button cycles 1× → 2× → 4× → 0.5×
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

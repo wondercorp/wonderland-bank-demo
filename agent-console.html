@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cheshire Cat — Agent Run</title>
+<style>
+  :root {
+    --bg: #0a0a14;
+    --panel: #141421;
+    --panel-2: #1c1c2e;
+    --border: #2a2a42;
+    --accent: #e91e88;
+    --accent-2: #ff9ed5;
+    --brand: #6b2d8c;
+    --text: #e8e3f0;
+    --muted: #8a7ca0;
+    --ok: #33ff88;
+    --warn: #ffb000;
+    --info: #50a0ff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 340px 1fr 420px;
+    height: 100vh;
+  }
+
+  /* ============ LEFT: Agent identity ============ */
+  .agent-panel {
+    background: linear-gradient(180deg, #1a0f2e 0%, var(--panel) 60%);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+  .agent-head { padding: 28px 24px; text-align: center; }
+  .avatar {
+    width: 96px; height: 96px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--accent-2), var(--accent) 55%, var(--brand));
+    box-shadow: 0 0 50px rgba(233,30,136,0.5);
+    position: relative;
+  }
+  .avatar::after {
+    content: "";
+    position: absolute; inset: -6px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    opacity: 0.5;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0; }
+  }
+  .agent-name { font-size: 22px; font-weight: 700; margin: 0 0 2px; }
+  .agent-role { color: var(--muted); font-size: 13px; margin: 0; }
+
+  .status-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 14px auto 0;
+    background: rgba(51,255,136,0.12);
+    border: 1px solid rgba(51,255,136,0.35);
+    color: var(--ok);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-chip .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 8px var(--ok);
+    animation: blink 1.4s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
+  .status-chip.idle { background: rgba(138,124,160,0.15); border-color: rgba(138,124,160,0.3); color: var(--muted); }
+  .status-chip.idle .dot { background: var(--muted); box-shadow: none; animation: none; }
+
+  .env {
+    margin: 22px 20px 12px;
+    padding: 14px 16px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .env .row { display: flex; justify-content: space-between; padding: 4px 0; }
+  .env .row .k { color: var(--muted); }
+  .env .row .v { color: var(--text); font-family: "Consolas", monospace; }
+  .env h4 {
+    margin: 0 0 8px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .tools {
+    margin: 12px 20px;
+    padding: 14px 16px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .tools h4 {
+    margin: 0 0 10px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .tool {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 0;
+    font-size: 12.5px;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+  .tool.active {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .tool .ic {
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+    background: var(--panel);
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .tool.active .ic { background: var(--accent); color: #fff; }
+
+  .clock {
+    margin-top: auto;
+    padding: 18px 24px;
+    text-align: center;
+    font-family: "Consolas", monospace;
+    font-size: 28px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    border-top: 1px solid var(--border);
+  }
+  .clock .label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: "Segoe UI", sans-serif;
+  }
+
+  /* ============ CENTER: Timeline ============ */
+  .timeline-panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .tl-head {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .tl-head h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  .tl-head .meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  .controls { display: flex; gap: 8px; }
+  .btn {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); }
+  .btn.primary:hover { background: #ff3aa0; }
+
+  .progress-wrap {
+    height: 4px;
+    background: var(--panel-2);
+    position: relative;
+  }
+  .progress {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .timeline {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+  }
+  .event {
+    display: grid;
+    grid-template-columns: 90px 44px 1fr;
+    gap: 14px;
+    padding: 14px 0;
+    align-items: start;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .event.shown { opacity: 1; transform: translateY(0); }
+  .event .ts {
+    color: var(--muted);
+    font-family: "Consolas", monospace;
+    font-size: 12px;
+    padding-top: 12px;
+    text-align: right;
+  }
+  .event .icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    border: 2px solid var(--border);
+    background: var(--panel);
+    flex-shrink: 0;
+  }
+  .event.sys-a .icon { color: var(--ok); border-color: var(--ok); }
+  .event.sys-b .icon { color: var(--info); border-color: var(--info); }
+  .event.sys-c .icon { color: #c080e8; border-color: var(--brand); }
+  .event.think .icon { color: var(--accent); border-color: var(--accent); background: rgba(233,30,136,0.1); }
+  .event.teams .icon { color: var(--info); border-color: var(--info); background: rgba(80,160,255,0.1); }
+  .event.ok .icon { color: var(--ok); border-color: var(--ok); background: rgba(51,255,136,0.1); }
+
+  .event .body {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .event .body .title {
+    font-weight: 600;
+    font-size: 14px;
+    margin: 0 0 4px;
+  }
+  .event .body .detail {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .event .body code {
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--accent-2);
+  }
+  .event.think .body { border-color: rgba(233,30,136,0.3); }
+
+  /* ============ RIGHT: Teams message preview ============ */
+  .teams-panel {
+    background: #f5f2f7;
+    color: #201f1e;
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .teams-head {
+    height: 52px;
+    background: #fff;
+    border-bottom: 1px solid #e1dfdd;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .teams-logo {
+    width: 28px; height: 28px;
+    background: #6264a7;
+    border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 14px;
+  }
+  .teams-title { font-weight: 600; font-size: 14px; }
+  .teams-sub { font-size: 12px; color: #605e5c; }
+
+  .teams-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f5f2f7;
+  }
+  .msg-placeholder {
+    color: #a19f9d;
+    text-align: center;
+    margin-top: 80px;
+    font-size: 14px;
+  }
+  .msg-placeholder .cat {
+    width: 64px; height: 64px; margin: 0 auto 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--accent-2), var(--accent) 55%, var(--brand));
+    opacity: 0.4;
+  }
+
+  .msg {
+    background: #fff;
+    border-radius: 6px;
+    padding: 0;
+    border: 1px solid #e1dfdd;
+    overflow: hidden;
+    display: none;
+    animation: slideIn 0.5s ease;
+  }
+  .msg.shown { display: block; }
+  @keyframes slideIn { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .msg-hdr {
+    padding: 12px 16px 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .msg-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--accent-2), var(--accent) 55%, var(--brand));
+    flex-shrink: 0;
+  }
+  .msg-from { font-weight: 600; font-size: 13px; }
+  .msg-from .bot {
+    background: #e8e4f1; color: #6264a7;
+    font-size: 9px; font-weight: 700;
+    padding: 1px 5px; border-radius: 3px;
+    margin-left: 4px; vertical-align: middle;
+  }
+  .msg-time { color: #605e5c; font-size: 11px; }
+  .msg-body { padding: 0 16px 12px 58px; }
+  .msg-body h3 { margin: 0 0 8px; font-size: 15px; }
+  .msg-body p { margin: 0 0 12px; font-size: 13.5px; line-height: 1.5; color: #323130; }
+
+  .mismatch-card {
+    background: #faf9fb;
+    border: 1px solid #e1dfdd;
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  .mismatch-card .mm-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .mismatch-card .mm-tag.missing { background: #fce4ec; color: #c2185b; }
+  .mismatch-card .mm-tag.held { background: #fff4e5; color: #c77700; }
+  .mismatch-card .mm-tag.drift { background: #e3f2fd; color: #1565c0; }
+  .mismatch-card h4 { margin: 0 0 4px; font-size: 13px; color: #201f1e; }
+  .mismatch-card p { margin: 0; font-size: 12.5px; color: #605e5c; line-height: 1.4; }
+
+  .msg-actions { padding: 8px 16px 16px 58px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .msg-btn {
+    background: #fff; border: 1px solid #c8c6c4;
+    padding: 6px 12px; font-size: 12px; border-radius: 4px;
+    cursor: pointer; color: #201f1e; font-weight: 500;
+    font-family: inherit;
+  }
+  .msg-btn.primary { background: #6264a7; color: #fff; border-color: #6264a7; }
+
+  .tl-foot {
+    padding: 14px 28px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* custom scrollbars */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #3a3a52; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4a4a62; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ LEFT: Agent ============ -->
+  <div class="agent-panel">
+    <div class="agent-head">
+      <div class="avatar"></div>
+      <h2 class="agent-name">Cheshire Cat</h2>
+      <p class="agent-role">Daily Reconciliation Agent</p>
+      <div class="status-chip" id="status-chip">
+        <span class="dot"></span>
+        <span id="status-text">Idle — ready to start</span>
+      </div>
+    </div>
+
+    <div class="env">
+      <h4>Runtime</h4>
+      <div class="row"><span class="k">Host</span> <span class="v">W365-CLOUD-PC</span></div>
+      <div class="row"><span class="k">Identity</span> <span class="v">cheshire@wonder</span></div>
+      <div class="row"><span class="k">Model</span> <span class="v">GPT-4 / Copilot</span></div>
+      <div class="row"><span class="k">Schedule</span> <span class="v">Weekdays 08:00</span></div>
+    </div>
+
+    <div class="tools">
+      <h4>Tools</h4>
+      <div class="tool" id="tool-tn3270"><span class="ic">A</span> TN3270 emulator + OCR</div>
+      <div class="tool" id="tool-portal"><span class="ic">C</span> Browser + PDF extract</div>
+      <div class="tool" id="tool-api"><span class="ic">B</span> D365 Web API</div>
+      <div class="tool" id="tool-excel"><span class="ic">X</span> Excel workbook</div>
+      <div class="tool" id="tool-teams"><span class="ic">T</span> Teams post</div>
+    </div>
+
+    <div class="clock">
+      <span id="clock">08:00:00</span>
+      <span class="label">Cloud PC clock</span>
+    </div>
+  </div>
+
+  <!-- ============ CENTER: Timeline ============ -->
+  <div class="timeline-panel">
+    <div class="tl-head">
+      <div>
+        <h1>Run log · 2026-04-23</h1>
+        <div class="meta" id="run-meta">Scheduled run · reconciliation for prior business day (2026-04-22)</div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="btn-reset">↻ Reset</button>
+        <button class="btn primary" id="btn-play">▶ Play</button>
+        <button class="btn" id="btn-speed">Speed: 1×</button>
+      </div>
+    </div>
+
+    <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+
+    <div class="timeline" id="timeline"></div>
+
+    <div class="tl-foot">
+      <span id="step-counter">Step 0 of 0</span>
+      <span>Press <b>Space</b> to play/pause · <b>R</b> to reset · <b>→</b> to skip forward</span>
+    </div>
+  </div>
+
+  <!-- ============ RIGHT: Teams ============ -->
+  <div class="teams-panel">
+    <div class="teams-head">
+      <div class="teams-logo">T</div>
+      <div>
+        <div class="teams-title">Alice Liddell</div>
+        <div class="teams-sub">Chat · Cheshire Cat (bot)</div>
+      </div>
+    </div>
+    <div class="teams-body" id="teams-body">
+      <div class="msg-placeholder" id="placeholder">
+        <div class="cat"></div>
+        Waiting for Cheshire Cat to finish the run…
+      </div>
+
+      <div class="msg" id="final-msg">
+        <div class="msg-hdr">
+          <div class="msg-avatar"></div>
+          <div>
+            <div class="msg-from">Cheshire Cat <span class="bot">BOT</span></div>
+            <div class="msg-time" id="final-time">Today 08:04</div>
+          </div>
+        </div>
+        <div class="msg-body">
+          <h3>☕ Good morning, Alice — your reconciliation is ready.</h3>
+          <p>Three data sources checked. <b>3 mismatches</b> found today. Full workbook attached; summary below.</p>
+
+          <div class="mismatch-card">
+            <span class="mm-tag missing">Missing in Portal</span>
+            <h4>#1 · White Rabbit Courier Co. <span style="color:#8a7ca0;font-weight:400;font-size:11px;">(C00019210)</span></h4>
+            <p>Mainframe posted 3 transactions (net +$1,450) but CheshirePay produced no settlement entries. Likely gateway routing failure — ops team confirmation needed.</p>
+          </div>
+
+          <div class="mismatch-card">
+            <span class="mm-tag held">Held for Review</span>
+            <h4>#2 · Cheshire Cat Ventures SA <span style="color:#8a7ca0;font-weight:400;font-size:11px;">(C00045011)</span></h4>
+            <p>Mainframe shows $7,800 XFR settled; CheshirePay flagged HELD (REVIEW). Risk team must release or reverse before 15:00 UTC wire cut-off.</p>
+          </div>
+
+          <div class="mismatch-card">
+            <span class="mm-tag drift">Balance Drift</span>
+            <h4>#3 · Queen of Hearts Confectionery <span style="color:#8a7ca0;font-weight:400;font-size:11px;">(C00028701)</span></h4>
+            <p>D365 balance is $500 above mainframe latest — TXN00043932 deposit posted to core but D365 not yet refreshed. Self-heals at 09:00 UTC sync.</p>
+          </div>
+
+          <p style="margin-top:12px;">You saved roughly <b>2h 50m</b> of typing this morning. Enjoy your coffee. 🐾</p>
+        </div>
+        <div class="msg-actions">
+          <a class="msg-btn primary" href="cheshire_reconciliation_2026-04-22.xlsx" download>📎 cheshire_reconciliation_2026-04-22.xlsx</a>
+          <button class="msg-btn" onclick="alert('Demo — would acknowledge the report.')">✓ Acknowledge</button>
+          <button class="msg-btn" onclick="alert('Demo — would escalate to ops.')">↗ Escalate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============== Timeline script ==============
+const steps = [
+  { t: "08:00:00", type: "think", tool: null,    title: "Triggered by schedule",
+    detail: "Running daily reconciliation for prior business day <code>2026-04-22</code>." },
+  { t: "08:00:04", type: "sys-a", tool: "tn3270", title: "Launching TN3270 emulator",
+    detail: "Connecting to <code>wbnk-mvs.wonderland.bank.corp:23</code> — no API available for core banking." },
+  { t: "08:00:11", type: "sys-a", tool: "tn3270", title: "Signed on as ALICE",
+    detail: "CICS application <code>WBCBS01</code> reached." },
+  { t: "08:00:18", type: "sys-a", tool: "tn3270", title: "Opened TRANLIST (option 03)",
+    detail: "Daily transaction list displayed — branch 001, currency USD." },
+  { t: "08:00:34", type: "sys-a", tool: "tn3270", title: "OCR extracted 15 transactions",
+    detail: "Screen buffer read, text normalised, amounts parsed. 3 customers with multiple entries." },
+  { t: "08:00:48", type: "sys-c", tool: "portal", title: "Opening CheshirePay partner portal",
+    detail: "Browser navigating to <code>partners.cheshirepay.com</code> — no API offered." },
+  { t: "08:00:56", type: "sys-c", tool: "portal", title: "Signed in with merchant credentials",
+    detail: "Vault-resolved secret used; merchant <code>WBNK-MERCH-0042</code>." },
+  { t: "08:01:08", type: "sys-c", tool: "portal", title: "Downloaded settlement PDF",
+    detail: "<code>settlement_2026-04-22.pdf</code> · 148 KB · 8 settlement rows." },
+  { t: "08:01:22", type: "sys-c", tool: "portal", title: "Extracted settlement table from PDF",
+    detail: "7 SETTLED, 1 HELD (REVIEW) for customer C00045011." },
+  { t: "08:01:31", type: "sys-b", tool: "api",    title: "Calling Dynamics 365 Web API",
+    detail: "<code>GET /api/data/v9.2/wbnk_customers</code> — 10 customers returned, 200 OK." },
+  { t: "08:01:35", type: "think", tool: null,    title: "Cross-checking three sources",
+    detail: "Joining on customer ID. Comparing transaction flows, settlement status, and registered balance." },
+  { t: "08:02:02", type: "think", tool: null,    title: "Mismatch #1 detected",
+    detail: "C00019210 (White Rabbit Courier) — 3 mainframe transactions, 0 portal settlements." },
+  { t: "08:02:14", type: "think", tool: null,    title: "Mismatch #2 detected",
+    detail: "C00045011 (Cheshire Cat Ventures) — 7,800 XFR settled on mainframe but HELD on portal." },
+  { t: "08:02:31", type: "think", tool: null,    title: "Mismatch #3 detected",
+    detail: "C00028701 (Queen of Hearts) — D365 registered_balance 500.00 above mainframe latest balance." },
+  { t: "08:03:15", type: "sys-b", tool: "excel",  title: "Writing reconciliation workbook",
+    detail: "4 sheets · <code>cheshire_reconciliation_2026-04-22.xlsx</code> · Mismatches sheet highlights all 3 items." },
+  { t: "08:04:17", type: "teams", tool: "teams",  title: "Posted summary to Alice in Teams",
+    detail: "Message delivered with mismatch cards + attached workbook + action buttons." },
+  { t: "08:04:18", type: "ok",    tool: null,    title: "Run complete",
+    detail: "Elapsed 4m 18s · Alice arrives in ~25 minutes. Agent idle until next schedule." }
+];
+
+let idx = 0, playing = false, timer = null, speed = 1;
+const speeds = [1, 2, 4, 0.5];
+
+const tl = document.getElementById('timeline');
+const progress = document.getElementById('progress');
+const stepCounter = document.getElementById('step-counter');
+const statusChip = document.getElementById('status-chip');
+const statusText = document.getElementById('status-text');
+const clock = document.getElementById('clock');
+const finalMsg = document.getElementById('final-msg');
+const placeholder = document.getElementById('placeholder');
+const btnPlay = document.getElementById('btn-play');
+const btnReset = document.getElementById('btn-reset');
+const btnSpeed = document.getElementById('btn-speed');
+
+function iconFor(type) {
+  return { "sys-a": "A", "sys-b": "B", "sys-c": "C", "think": "🐾", "teams": "T", "ok": "✓" }[type] || "•";
+}
+
+function render() {
+  tl.innerHTML = "";
+  steps.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = `event ${s.type}` + (i <= idx - 1 ? " shown" : "");
+    div.innerHTML = `
+      <div class="ts">${s.t}</div>
+      <div class="icon">${iconFor(s.type)}</div>
+      <div class="body">
+        <div class="title">${s.title}</div>
+        <div class="detail">${s.detail}</div>
+      </div>
+    `;
+    tl.appendChild(div);
+  });
+  const pct = Math.max(0, Math.min(100, (idx / steps.length) * 100));
+  progress.style.width = pct + "%";
+  stepCounter.textContent = `Step ${idx} of ${steps.length}`;
+}
+
+function highlightTool(toolId) {
+  document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
+  if (toolId) {
+    const el = document.getElementById('tool-' + toolId);
+    if (el) el.classList.add('active');
+  }
+}
+
+function setStatus(running) {
+  if (running) {
+    statusChip.classList.remove('idle');
+    statusText.textContent = "Running · ";
+    statusText.innerHTML = 'Running · <span id="tool-name">working</span>';
+  } else {
+    statusChip.classList.add('idle');
+    statusText.textContent = idx >= steps.length ? "Completed" : "Idle — ready to start";
+  }
+}
+
+function tickOne() {
+  if (idx >= steps.length) {
+    stop();
+    finalMsg.classList.add('shown');
+    placeholder.style.display = 'none';
+    document.getElementById('final-time').textContent = `Today ${steps[steps.length - 2].t.slice(0,5)}`;
+    highlightTool(null);
+    setStatus(false);
+    statusText.textContent = `Completed · ${steps[steps.length - 1].t}`;
+    return;
+  }
+  const s = steps[idx];
+  clock.textContent = s.t;
+  highlightTool(s.tool);
+  idx++;
+  render();
+  // auto-scroll latest into view
+  const last = tl.querySelector('.event.shown:last-child');
+  if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // schedule next based on simulated time gap
+  if (playing && idx < steps.length) {
+    const gap = secsBetween(steps[idx - 1].t, steps[idx].t);
+    // compress real time: 1 simulated second = 120ms at 1x
+    const realMs = Math.min(4000, Math.max(400, gap * 120 / speed));
+    timer = setTimeout(tickOne, realMs);
+  } else if (playing && idx >= steps.length) {
+    // schedule the final update
+    timer = setTimeout(tickOne, 400);
+  }
+}
+
+function secsBetween(a, b) {
+  const [ah, am, as] = a.split(':').map(Number);
+  const [bh, bm, bs] = b.split(':').map(Number);
+  return (bh * 3600 + bm * 60 + bs) - (ah * 3600 + am * 60 + as);
+}
+
+function play() {
+  if (idx >= steps.length) reset();
+  playing = true;
+  btnPlay.textContent = "⏸ Pause";
+  setStatus(true);
+  tickOne();
+}
+
+function stop() {
+  playing = false;
+  btnPlay.textContent = "▶ Play";
+  if (timer) { clearTimeout(timer); timer = null; }
+  setStatus(false);
+}
+
+function reset() {
+  stop();
+  idx = 0;
+  finalMsg.classList.remove('shown');
+  placeholder.style.display = 'block';
+  clock.textContent = "08:00:00";
+  highlightTool(null);
+  render();
+  statusText.textContent = "Idle — ready to start";
+}
+
+btnPlay.addEventListener('click', () => { playing ? stop() : play(); });
+btnReset.addEventListener('click', reset);
+btnSpeed.addEventListener('click', () => {
+  const i = speeds.indexOf(speed);
+  speed = speeds[(i + 1) % speeds.length];
+  btnSpeed.textContent = `Speed: ${speed}×`;
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === ' ') { e.preventDefault(); playing ? stop() : play(); }
+  if (e.key.toLowerCase() === 'r') reset();
+  if (e.key === 'ArrowRight') { if (!playing) tickOne(); }
+});
+
+render();
+</script>
+</body>
+</html>
