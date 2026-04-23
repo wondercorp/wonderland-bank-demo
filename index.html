@@ -133,6 +133,48 @@
     color: var(--muted);
   }
   .footer a { color: var(--accent); text-decoration: none; }
+
+  .downloads {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  .downloads h3 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .dl-sub { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+  .dl-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 820px) { .dl-grid { grid-template-columns: 1fr; } }
+  .dl-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .dl-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .dl-icon {
+    width: 44px; height: 52px;
+    color: #fff; font-weight: 700; font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .dl-icon.before { background: #6a6a6a; }
+  .dl-icon.after { background: #1d6f42; }
+  .dl-title { font-weight: 600; font-size: 14px; }
+  .dl-meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -168,6 +210,27 @@
       <p>Partner portal for the bank's payment processor. Daily settlement reports must be downloaded as PDF. Requires login, no API provided.</p>
       <div class="creds">PASSWORD <b>cheshire123</b> &nbsp; (any email / merchant ID)</div>
     </a>
+  </div>
+
+  <div class="downloads">
+    <h3>Reconciliation workbooks</h3>
+    <p class="dl-sub">The output of the reconciliation, before and after Cheshire Cat.</p>
+    <div class="dl-grid">
+      <a class="dl-card" href="alice_reconciliation_2026-04-22.xlsx" download>
+        <div class="dl-icon before">XLSX</div>
+        <div>
+          <div class="dl-title">Before — Alice's manual workbook</div>
+          <div class="dl-meta">2 sheets · TRANLIST + CheshirePay · 75 min of typing</div>
+        </div>
+      </a>
+      <a class="dl-card" href="cheshire_reconciliation_2026-04-22.xlsx" download>
+        <div class="dl-icon after">XLSX</div>
+        <div>
+          <div class="dl-title">After — Cheshire Cat's reconciliation</div>
+          <div class="dl-meta">4 sheets · adds D365 + Mismatches · 3 issues flagged</div>
+        </div>
+      </a>
+    </div>
   </div>
 
   <div class="footer">
