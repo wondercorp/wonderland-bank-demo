@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WONDERLAND BANK - CICS MAINFRAME TN3270</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;700&display=swap');
+
+  html, body {
+    margin: 0; padding: 0;
+    background: #000;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'VT323', 'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  /* CRT scanline + glow effect */
+  .crt {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, #001a00 0%, #000 90%);
+    padding: 30px 40px;
+    color: #33ff33;
+    font-size: 20px;
+    line-height: 1.25;
+    text-shadow: 0 0 2px #33ff33, 0 0 6px rgba(51,255,51,0.6);
+    letter-spacing: 1px;
+    overflow: hidden;
+  }
+  .crt::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0.25) 3px,
+      rgba(0,0,0,0) 4px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+  .crt::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 9;
+  }
+
+  .flicker { animation: flicker 6s infinite; }
+  @keyframes flicker {
+    0%, 96%, 100% { opacity: 1; }
+    97% { opacity: 0.85; }
+    98% { opacity: 1; }
+    99% { opacity: 0.9; }
+  }
+
+  pre {
+    margin: 0;
+    white-space: pre;
+    font-family: inherit;
+    font-size: 20px;
+  }
+
+  .header-bar {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #33ff33;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+  }
+
+  .footer-bar {
+    position: absolute;
+    bottom: 20px;
+    left: 40px;
+    right: 40px;
+    border-top: 1px solid #33ff33;
+    padding-top: 6px;
+    font-size: 18px;
+    color: #33ff33;
+  }
+
+  .input-field {
+    background: transparent;
+    border: none;
+    color: #33ff33;
+    font-family: inherit;
+    font-size: 20px;
+    text-shadow: inherit;
+    letter-spacing: 1px;
+    outline: none;
+    border-bottom: 1px solid #33ff33;
+    padding: 0 4px;
+    caret-color: #33ff33;
+  }
+  .input-field:focus { background: #002200; }
+
+  .cursor {
+    display: inline-block;
+    width: 12px;
+    background: #33ff33;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { background: transparent; } }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .amber { color: #ffb000; text-shadow: 0 0 2px #ffb000, 0 0 6px rgba(255,176,0,0.6); }
+  .white { color: #ccffcc; text-shadow: 0 0 2px #fff, 0 0 6px rgba(255,255,255,0.4); }
+
+  .boot-line { opacity: 0; }
+  .typewriter { display: inline-block; overflow: hidden; white-space: nowrap; border-right: 2px solid #33ff33; animation: none; }
+
+  table { border-collapse: collapse; width: 100%; }
+  td, th { padding: 2px 8px; text-align: left; }
+</style>
+</head>
+<body>
+
+<div class="crt flicker">
+
+  <!-- ================== BOOT SCREEN ================== -->
+  <div id="screen-boot" class="screen active">
+    <pre id="boot-text"></pre>
+  </div>
+
+  <!-- ================== LOGON SCREEN ================== -->
+  <div id="screen-logon" class="screen">
+    <div class="header-bar">
+      <span>CICS/VS APPLID = WBNKCICS</span>
+      <span>TERMINAL = TN3270-L02</span>
+      <span id="logon-time"></span>
+    </div>
+
+<pre>
+                 *** WONDERLAND BANK CORPORATION ***
+                  CORE BANKING SYSTEM  -  WBCBS/01
+                 -------------------------------------
+
+                    .--.
+                   |o_o |      SYSTEM ID : WBNKCICS01
+                   |:_/ |      RELEASE   : V04.R02.M08
+                  //   \ \     LAST IPL  : 2026-04-22 03:00:14
+                 (|     | )    CPU       : z/14 MODEL 8561
+                /'\_   _/`\    LPAR      : WBPROD
+                \___)=(___/    STATUS    : <span class="amber">OPERATIONAL</span>
+
+
+          UNAUTHORIZED ACCESS IS PROHIBITED AND WILL BE PROSECUTED
+          UNDER THE WONDERLAND FINANCIAL INSTRUMENTS ACT OF 1985.
+
+          ======================================================
+          USERID    ===> <input class="input-field" id="userid" maxlength="8" autocomplete="off" spellcheck="false" value="ALICE">
+          PASSWORD  ===> <input class="input-field" id="password" type="password" maxlength="8" autocomplete="off">
+          APPLID    ===> <input class="input-field" id="applid" maxlength="8" value="WBCBS01">
+          GROUPID   ===> <input class="input-field" id="groupid" maxlength="8" value="OPSGRP">
+          ======================================================
+
+          <span class="amber">HINT:</span> Password is <span class="white">WONDER85</span>   (demo only)
+
+</pre>
+
+    <div class="footer-bar">
+      F1=HELP  F3=EXIT  F12=CANCEL  ENTER=SIGN ON &nbsp; | &nbsp;
+      <span id="logon-msg">PLEASE ENTER USERID AND PASSWORD</span>
+    </div>
+  </div>
+
+  <!-- ================== MAIN MENU ================== -->
+  <div id="screen-menu" class="screen">
+    <div class="header-bar">
+      <span>WBCBS01 - MAIN MENU</span>
+      <span>USER: ALICE</span>
+      <span id="menu-time"></span>
+    </div>
+<pre>
+                     WONDERLAND BANK CORE SYSTEM (WBCBS)
+                     ===================================
+
+                     SELECT AN OPTION AND PRESS ENTER
+
+                     01  CUSTOMER INQUIRY
+                     02  ACCOUNT BALANCE INQUIRY
+                     03  <span class="amber">DAILY TRANSACTION LIST  (TRANLIST)</span>
+                     04  FUNDS TRANSFER
+                     05  LOAN SERVICING
+                     06  REPORTS AND EXTRACTS
+                     07  BATCH JOB STATUS
+                     08  SYSTEM ADMINISTRATION
+                     99  SIGN OFF
+
+                     OPTION ===> <input class="input-field" id="menu-option" maxlength="2" value="03">
+
+                     MESSAGES:
+                     <span class="amber">WB0021I  WELCOME ALICE. LAST LOGON 2026-04-22 08:47.</span>
+                     <span class="amber">WB0105I  3 REPORTS AWAITING REVIEW IN QUEUE OPSQ01.</span>
+</pre>
+    <div class="footer-bar">
+      F1=HELP  F3=EXIT  F7=BACK  F8=FWD  F12=CANCEL  ENTER=SELECT
+    </div>
+  </div>
+
+  <!-- ================== TRANSACTION LIST ================== -->
+  <div id="screen-tran" class="screen">
+    <div class="header-bar">
+      <span>WBCBS01 - TRANLIST</span>
+      <span>DATE: 2026-04-22  (PREV BUSINESS DAY)</span>
+      <span id="tran-time"></span>
+    </div>
+<pre>
+                        DAILY TRANSACTION LIST  (TRANLIST)
+                        =================================
+BRANCH: 001 HQ          CURRENCY: USD          PAGE 01 OF 01
+
+TXN-ID       TIME      ACCT-NO         CUST-ID    TYPE   AMOUNT           BALANCE
+---------    --------  -------------   --------   ----   --------------   --------------
+TXN00043921  08:12:04  1001-0025-7731  C00017842  DEP        5,200.00         48,310.22
+TXN00043922  08:47:51  1001-0041-2200  C00019210  WDL       -1,100.00         12,908.45
+TXN00043923  09:03:19  1001-0088-4410  C00022114  DEP       15,000.00        221,455.00
+TXN00043924  09:21:02  1001-0041-2200  C00019210  WDL         -450.00         12,458.45
+TXN00043925  10:05:44  1001-0105-9920  C00028701  XFR       -2,300.00          8,770.10
+TXN00043926  10:18:33  1001-0202-1188  C00031005  DEP          980.00          6,420.00
+TXN00043927  11:02:15  <span class="amber">1001-0041-2200  C00019210  DEP        3,000.00         15,458.45</span>
+TXN00043928  11:44:08  1001-0311-0077  C00034520  WDL         -600.00         21,300.00
+TXN00043929  13:10:29  1001-0088-4410  C00022114  WDL       -5,000.00        216,455.00
+TXN00043930  14:02:51  1001-0420-5533  C00038915  DEP        1,250.00         42,010.77
+TXN00043931  14:35:17  <span class="amber">1001-0511-7788  C00040122  DEP       12,000.00         88,044.00</span>
+TXN00043932  15:11:40  1001-0105-9920  C00028701  DEP          500.00          9,270.10
+TXN00043933  15:58:22  1001-0620-1122  C00042330  WDL         -300.00          4,700.00
+TXN00043934  16:30:05  <span class="amber">1001-0715-3344  C00045011  XFR       -7,800.00        102,200.00</span>
+TXN00043935  16:52:18  1001-0311-0077  C00034520  DEP          200.00         21,500.00
+
+                       TOTALS:   CREDITS   37,930.00
+                                 DEBITS   -17,550.00
+                                 NET       20,380.00
+
+                       TRANSACTIONS: 15     EXCEPTIONS: 0
+</pre>
+    <div class="footer-bar">
+      F1=HELP  F3=EXIT  F5=REFRESH  F7=PGUP  F8=PGDN  F10=EXPORT  F12=MENU
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // --- Clocks ---
+  function pad(n){return String(n).padStart(2,'0');}
+  function fmtTime(){
+    const d = new Date();
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'  '+
+           pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  }
+  setInterval(()=>{
+    ['logon-time','menu-time','tran-time'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.textContent = fmtTime();
+    });
+  }, 1000);
+
+  // --- Boot sequence ---
+  const bootLines = [
+    "IBM 3270 TERMINAL EMULATOR v4.2.1",
+    "(C) 1985-2026 WONDERLAND BANK CORPORATION",
+    "",
+    "INITIALIZING TN3270E SESSION...",
+    "CONNECTING TO HOST: wbnk-mvs.wonderland.bank.corp:23",
+    "NEGOTIATING TELNET OPTIONS..... OK",
+    "TERMINAL TYPE: IBM-3278-2-E         OK",
+    "LU NAME:       TN3270L02            OK",
+    "SSL/TLS:       ENABLED (TLSv1.2)    OK",
+    "",
+    "VTAM MSG: IST1635I 'TN3270L02' ACQUIRED BY APPLID 'WBCBS01'",
+    "VTAM MSG: IST663I   SESSION ESTABLISHED",
+    "",
+    "LOADING BMS MAPSET WBCBSMAP ..... OK",
+    "LOADING CICS TRANSACTION WBSN .... OK",
+    "",
+    "READY."
+  ];
+  const bootEl = document.getElementById('boot-text');
+  let bi = 0;
+  function bootStep(){
+    if(bi < bootLines.length){
+      bootEl.textContent += bootLines[bi] + '\n';
+      bi++;
+      setTimeout(bootStep, 180 + Math.random()*120);
+    } else {
+      setTimeout(()=>{ show('screen-logon'); document.getElementById('userid').focus(); }, 600);
+    }
+  }
+  setTimeout(bootStep, 400);
+
+  function show(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // Deep-link via URL hash: #logon, #menu, #tran  (skips boot for demo replays)
+  const hash = (location.hash || '').replace('#','').toLowerCase();
+  if (hash === 'logon' || hash === 'menu' || hash === 'tran') {
+    // cancel boot animation
+    bi = bootLines.length + 999;
+    const target = { logon:'screen-logon', menu:'screen-menu', tran:'screen-tran' }[hash];
+    setTimeout(()=>show(target), 50);
+  }
+
+  // --- Key handling ---
+  document.addEventListener('keydown', e => {
+    const active = document.querySelector('.screen.active').id;
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (active === 'screen-logon') {
+        const u = document.getElementById('userid').value.trim().toUpperCase();
+        const p = document.getElementById('password').value;
+        if (u === 'ALICE' && p === 'WONDER85') {
+          document.getElementById('logon-msg').textContent = 'WB0001I  SIGN ON SUCCESSFUL. LOADING...';
+          setTimeout(()=>{ show('screen-menu'); document.getElementById('menu-option').focus(); }, 700);
+        } else {
+          document.getElementById('logon-msg').innerHTML = '<span class="amber">WB0099E  INVALID USERID OR PASSWORD. TRY ALICE / WONDER85</span>';
+        }
+      } else if (active === 'screen-menu') {
+        const opt = document.getElementById('menu-option').value.trim();
+        if (opt === '03') { show('screen-tran'); }
+        else if (opt === '99') { show('screen-logon'); }
+        else { alert('Demo: only option 03 (TRANLIST) is wired up.'); }
+      }
+    }
+
+    if (e.key === 'F3' || (e.key === 'Escape')) {
+      e.preventDefault();
+      if (active === 'screen-tran') show('screen-menu');
+      else if (active === 'screen-menu') show('screen-logon');
+    }
+    if (e.key === 'F12') {
+      e.preventDefault();
+      if (active === 'screen-tran') show('screen-menu');
+    }
+  });
+</script>
+</body>
+</html>

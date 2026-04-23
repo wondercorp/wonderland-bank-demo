@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wonderland Bank CRM — Customer Service Hub</title>
+<style>
+  :root {
+    --d365-blue: #0078d4;
+    --d365-blue-dark: #005a9e;
+    --d365-navy: #201f1e;
+    --d365-sidebar: #f3f2f1;
+    --d365-hover: #edebe9;
+    --d365-border: #e1dfdd;
+    --d365-text: #201f1e;
+    --d365-muted: #605e5c;
+    --d365-accent: #0078d4;
+    --d365-selected: #deecf9;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; font-family: "Segoe UI", system-ui, sans-serif; color: var(--d365-text); background: #faf9f8; font-size: 14px; }
+
+  /* ============ Top bar ============ */
+  .topbar {
+    height: 48px;
+    background: var(--d365-navy);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-size: 14px;
+  }
+  .topbar .waffle {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .topbar .waffle svg { fill: #fff; }
+  .topbar .product {
+    display: flex; align-items: center; gap: 10px;
+    margin-left: 4px; font-weight: 600;
+  }
+  .topbar .product .tile {
+    width: 22px; height: 22px;
+    background: var(--d365-blue);
+    display: inline-block;
+    position: relative;
+  }
+  .topbar .product .tile::after {
+    content: "D";
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 13px; font-family: "Segoe UI", sans-serif;
+  }
+  .topbar .product .sub { font-weight: 400; opacity: 0.85; margin-left: 4px; }
+  .topbar .search {
+    flex: 1;
+    max-width: 640px;
+    margin: 0 24px;
+    height: 32px;
+    background: #3b3a39;
+    border-radius: 2px;
+    display: flex; align-items: center;
+    padding: 0 10px;
+    color: #d2d0ce;
+  }
+  .topbar .search input {
+    background: transparent; border: none; color: #fff;
+    outline: none; width: 100%; margin-left: 8px; font-size: 13px;
+    font-family: inherit;
+  }
+  .topbar .right { display: flex; align-items: center; gap: 10px; }
+  .topbar .right .env {
+    background: #2a2825; border: 1px solid #484644; padding: 4px 10px;
+    border-radius: 2px; font-size: 12px; color: #d2d0ce;
+  }
+  .topbar .right .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #8e44ad; color: #fff; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+
+  /* ============ Command bar ============ */
+  .cmdbar {
+    height: 44px;
+    background: #fff;
+    border-bottom: 1px solid var(--d365-border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 4px;
+    font-size: 14px;
+  }
+  .cmd {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    color: var(--d365-text);
+  }
+  .cmd:hover { background: var(--d365-hover); }
+  .cmd .ico {
+    width: 16px; height: 16px;
+    display: inline-block;
+    color: var(--d365-blue);
+    font-weight: 700;
+  }
+  .cmd-separator { width: 1px; height: 20px; background: var(--d365-border); margin: 0 4px; }
+  .cmd.primary { color: var(--d365-blue); font-weight: 600; }
+
+  /* ============ Layout ============ */
+  .app {
+    display: flex;
+    height: calc(100vh - 48px - 44px - 48px); /* minus top + cmd + breadcrumb */
+  }
+  .sidebar {
+    width: 240px;
+    background: var(--d365-sidebar);
+    border-right: 1px solid var(--d365-border);
+    padding: 12px 0;
+    overflow-y: auto;
+  }
+  .sidebar .group {
+    padding: 8px 16px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--d365-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .sidebar .item {
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+  }
+  .sidebar .item:hover { background: var(--d365-hover); }
+  .sidebar .item.active {
+    background: var(--d365-selected);
+    border-left-color: var(--d365-blue);
+    font-weight: 600;
+    color: var(--d365-blue-dark);
+  }
+  .sidebar .item .icon { width: 16px; text-align: center; color: var(--d365-muted); }
+  .sidebar .item.active .icon { color: var(--d365-blue); }
+
+  .main {
+    flex: 1;
+    overflow: auto;
+    background: #fff;
+  }
+
+  .breadcrumb {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--d365-border);
+    background: #fff;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--d365-text);
+  }
+  .breadcrumb .small {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--d365-muted);
+    margin-left: 12px;
+  }
+  .breadcrumb .view-picker {
+    margin-left: 16px;
+    font-size: 14px;
+    color: var(--d365-blue);
+    cursor: pointer;
+    font-weight: 400;
+  }
+
+  /* ============ View tabs ============ */
+  .view-tabs {
+    display: flex;
+    padding: 0 24px;
+    background: #fff;
+    border-bottom: 1px solid var(--d365-border);
+    height: 40px;
+  }
+  .view-tab {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    border-bottom: 2px solid transparent;
+    color: var(--d365-muted);
+  }
+  .view-tab.active {
+    color: var(--d365-blue);
+    border-bottom-color: var(--d365-blue);
+    font-weight: 600;
+  }
+
+  /* ============ Table ============ */
+  .table-wrap {
+    padding: 0;
+  }
+  table.grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.grid thead th {
+    text-align: left;
+    padding: 10px 14px;
+    background: #fafafa;
+    border-bottom: 1px solid var(--d365-border);
+    font-weight: 600;
+    color: var(--d365-text);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    white-space: nowrap;
+  }
+  table.grid thead th .caret {
+    margin-left: 4px;
+    opacity: 0.4;
+    font-size: 10px;
+  }
+  table.grid tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--d365-border);
+    vertical-align: middle;
+  }
+  table.grid tbody tr:hover { background: #f8f8f8; cursor: pointer; }
+  table.grid tbody tr.selected { background: var(--d365-selected); }
+
+  .chk {
+    width: 14px; height: 14px;
+    border: 1px solid #a19f9d;
+    border-radius: 2px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .cust-link { color: var(--d365-blue); cursor: pointer; font-weight: 500; }
+  .cust-link:hover { text-decoration: underline; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag.prem { background: #fff4ce; color: #7a4f00; }
+  .tag.std { background: #e1dfdd; color: #605e5c; }
+  .tag.vip { background: #c7e0f4; color: #004578; }
+
+  .initial {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 600; font-size: 12px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .footer-bar {
+    height: 48px;
+    background: #fff;
+    border-top: 1px solid var(--d365-border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    font-size: 12px;
+    color: var(--d365-muted);
+    justify-content: space-between;
+  }
+
+  /* ============ API panel (flyout) ============ */
+  .api-fab {
+    position: fixed;
+    bottom: 72px;
+    right: 24px;
+    background: var(--d365-blue);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    z-index: 20;
+  }
+  .api-fab:hover { background: var(--d365-blue-dark); }
+
+  .api-panel {
+    position: fixed;
+    top: 0; right: -560px;
+    width: 540px;
+    height: 100vh;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    font-family: "Consolas", "Courier New", monospace;
+    box-shadow: -6px 0 24px rgba(0,0,0,0.3);
+    transition: right 0.25s ease;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+  }
+  .api-panel.open { right: 0; }
+  .api-panel .api-head {
+    background: #2d2d2d;
+    padding: 12px 18px;
+    border-bottom: 1px solid #3e3e42;
+    color: #fff;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 13px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .api-panel .api-head .close {
+    cursor: pointer; font-size: 18px; color: #aaa; line-height: 1;
+  }
+  .api-panel .endpoint {
+    padding: 12px 18px;
+    background: #252526;
+    border-bottom: 1px solid #3e3e42;
+    font-size: 12px;
+    word-break: break-all;
+  }
+  .api-panel .endpoint .method {
+    background: #2f6b2d; color: #fff;
+    padding: 2px 8px; border-radius: 2px;
+    font-weight: 700; margin-right: 8px;
+    font-family: "Segoe UI", sans-serif;
+  }
+  .api-panel pre {
+    margin: 0;
+    padding: 16px 18px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    overflow: auto;
+    flex: 1;
+    white-space: pre;
+  }
+  .json-key { color: #9cdcfe; }
+  .json-str { color: #ce9178; }
+  .json-num { color: #b5cea8; }
+  .json-bool { color: #569cd6; }
+  .json-null { color: #569cd6; }
+
+  .dl-btn {
+    display: inline-block;
+    padding: 6px 14px;
+    background: transparent;
+    color: #d4d4d4;
+    border: 1px solid #5a5a5a;
+    border-radius: 2px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: "Segoe UI", sans-serif;
+  }
+  .dl-btn:hover { background: #2d2d2d; }
+</style>
+</head>
+<body>
+
+<!-- ============ Top bar ============ -->
+<div class="topbar">
+  <div class="waffle" title="App launcher">
+    <svg width="16" height="16" viewBox="0 0 16 16"><path d="M1 1h4v4H1zM6 1h4v4H6zM11 1h4v4h-4zM1 6h4v4H1zM6 6h4v4H6zM11 6h4v4h-4zM1 11h4v4H1zM6 11h4v4H6zM11 11h4v4h-4z"/></svg>
+  </div>
+  <div class="product">
+    <span class="tile"></span>
+    <span>Dynamics 365</span>
+    <span class="sub">| Customer Service Hub</span>
+  </div>
+  <div class="search">
+    <span>🔍</span>
+    <input placeholder="Search" />
+  </div>
+  <div class="right">
+    <div class="env">WonderlandBank (prod)</div>
+    <div>⚙</div>
+    <div>🔔</div>
+    <div class="avatar">AL</div>
+  </div>
+</div>
+
+<!-- ============ Command bar ============ -->
+<div class="cmdbar">
+  <div class="cmd primary"><span class="ico">＋</span> New</div>
+  <div class="cmd-separator"></div>
+  <div class="cmd"><span class="ico">🗑</span> Delete</div>
+  <div class="cmd"><span class="ico">⟳</span> Refresh</div>
+  <div class="cmd"><span class="ico">📧</span> Send Link</div>
+  <div class="cmd"><span class="ico">📊</span> Visualize this view</div>
+  <div class="cmd"><span class="ico">📥</span> Export to Excel ▾</div>
+  <div class="cmd"><span class="ico">🔗</span> Flow ▾</div>
+  <div class="cmd"><span class="ico">⋯</span></div>
+  <div style="flex:1"></div>
+  <div class="cmd"><span class="ico">🔎</span> Filter by keyword</div>
+</div>
+
+<!-- ============ Breadcrumb ============ -->
+<div class="breadcrumb">
+  Active Customers
+  <span class="view-picker">▾</span>
+  <span class="small">System View &middot; Last modified 2026-04-20</span>
+</div>
+
+<!-- ============ Body ============ -->
+<div class="app">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="group">My Work</div>
+    <div class="item"><span class="icon">🏠</span> Dashboards</div>
+    <div class="item"><span class="icon">📋</span> Activities</div>
+
+    <div class="group">Customers</div>
+    <div class="item active"><span class="icon">👤</span> Customers</div>
+    <div class="item"><span class="icon">🏢</span> Accounts</div>
+    <div class="item"><span class="icon">📇</span> Contacts</div>
+
+    <div class="group">Service</div>
+    <div class="item"><span class="icon">🎫</span> Cases</div>
+    <div class="item"><span class="icon">📚</span> Knowledge Articles</div>
+    <div class="item"><span class="icon">📅</span> Queues</div>
+
+    <div class="group">Collateral</div>
+    <div class="item"><span class="icon">💼</span> Loans</div>
+    <div class="item"><span class="icon">💳</span> Cards</div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="view-tabs">
+      <div class="view-tab active">All Customers</div>
+      <div class="view-tab">Premium</div>
+      <div class="view-tab">VIP</div>
+      <div class="view-tab">Recently Modified</div>
+      <div class="view-tab">Flagged for Review</div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="grid" id="cust-table">
+        <thead>
+          <tr>
+            <th style="width:32px;"><span class="chk"></span></th>
+            <th>Customer ID <span class="caret">▼</span></th>
+            <th>Full Name</th>
+            <th>Primary Account</th>
+            <th>Segment</th>
+            <th>Branch</th>
+            <th>Relationship Mgr</th>
+            <th>Registered Balance (USD)</th>
+            <th>Modified On</th>
+          </tr>
+        </thead>
+        <tbody id="cust-rows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Footer ============ -->
+<div class="footer-bar">
+  <div><span id="row-count">10</span> of 10 &middot; All records selected on this page</div>
+  <div>Wonderland Bank | Dynamics 365 v9.2.24044.114</div>
+</div>
+
+<!-- ============ API panel ============ -->
+<div class="api-fab" onclick="togglePanel()">⟨ / ⟩ &nbsp;API view</div>
+
+<div class="api-panel" id="api-panel">
+  <div class="api-head">
+    <div><b>Web API preview</b> &middot; the one place integration actually works</div>
+    <span class="close" onclick="togglePanel()">✕</span>
+  </div>
+  <div class="endpoint">
+    <span class="method">GET</span>
+    https://wonderlandbank.crm.dynamics.com/api/data/v9.2/wbnk_customers?$select=wbnk_customerid,fullname,accountnumber,segment,branch,mgr,registered_balance,modifiedon
+  </div>
+  <pre id="api-json"></pre>
+  <div style="padding:10px 18px; background:#252526; border-top:1px solid #3e3e42; display:flex; gap:8px;">
+    <button class="dl-btn" onclick="downloadJson()">Download JSON</button>
+    <button class="dl-btn" onclick="copyJson()">Copy to clipboard</button>
+    <div style="flex:1"></div>
+    <span style="font-size:11px; color:#888; align-self:center;">200 OK &middot; 1.4 KB</span>
+  </div>
+</div>
+
+<script>
+  // ====== Customer data (matches System A TRANLIST customer IDs) ======
+  const customers = [
+    { id: "C00017842", name: "Mad Hatter Holdings LLC",     account: "1001-0025-7731", segment: "Premium", branch: "001 HQ",    mgr: "B. Bandersnatch", balance: 48310.22,  modified: "2026-04-22T14:12Z" },
+    { id: "C00019210", name: "White Rabbit Courier Co.",    account: "1001-0041-2200", segment: "Standard", branch: "001 HQ",   mgr: "T. Tweedle",      balance: 15458.45,  modified: "2026-04-22T11:02Z" },
+    { id: "C00022114", name: "Caterpillar Capital Partners",account: "1001-0088-4410", segment: "VIP",     branch: "007 Mirror", mgr: "C. Cheshire",    balance: 216455.00, modified: "2026-04-22T13:10Z" },
+    { id: "C00028701", name: "Queen of Hearts Confectionery",account:"1001-0105-9920", segment: "Premium", branch: "003 Downtown",mgr:"D. Dormouse",    balance: 9270.10,   modified: "2026-04-22T15:11Z" },
+    { id: "C00031005", name: "March Hare Logistics",        account: "1001-0202-1188", segment: "Standard", branch: "003 Downtown",mgr:"T. Tweedle",    balance: 6420.00,   modified: "2026-04-22T10:18Z" },
+    { id: "C00034520", name: "Looking-Glass Consulting Ltd",account: "1001-0311-0077", segment: "Premium", branch: "007 Mirror", mgr: "C. Cheshire",    balance: 21500.00,  modified: "2026-04-22T16:52Z" },
+    { id: "C00038915", name: "Jabberwock Manufacturing GmbH",account:"1001-0420-5533", segment: "Standard", branch: "012 Tulgey", mgr: "B. Bandersnatch", balance: 42010.77, modified: "2026-04-22T14:02Z" },
+    { id: "C00040122", name: "Walrus & Carpenter Trading",  account: "1001-0511-7788", segment: "VIP",     branch: "001 HQ",     mgr: "D. Dormouse",    balance: 88044.00,  modified: "2026-04-22T14:35Z" },
+    { id: "C00042330", name: "Oyster Bay Seafood Inc.",     account: "1001-0620-1122", segment: "Standard", branch: "012 Tulgey", mgr: "T. Tweedle",     balance: 4700.00,   modified: "2026-04-22T15:58Z" },
+    { id: "C00045011", name: "Cheshire Cat Ventures SA",    account: "1001-0715-3344", segment: "VIP",     branch: "007 Mirror", mgr: "C. Cheshire",    balance: 102200.00, modified: "2026-04-22T16:30Z" }
+  ];
+
+  // ====== Render table ======
+  const colors = ["#8e44ad","#0078d4","#d83b01","#107c10","#b4009e","#00b294","#ca5010","#498205","#5c2e91","#038387"];
+  function initials(name){ return name.split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase(); }
+  function tagCls(seg){ return seg === "Premium" ? "prem" : seg === "VIP" ? "vip" : "std"; }
+
+  const tbody = document.getElementById("cust-rows");
+  customers.forEach((c, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><span class="chk"></span></td>
+      <td><span class="cust-link">${c.id}</span></td>
+      <td>
+        <span class="initial" style="background:${colors[i % colors.length]}">${initials(c.name)}</span>
+        <span class="cust-link">${c.name}</span>
+      </td>
+      <td>${c.account}</td>
+      <td><span class="tag ${tagCls(c.segment)}">${c.segment}</span></td>
+      <td>${c.branch}</td>
+      <td>${c.mgr}</td>
+      <td style="text-align:right; font-variant-numeric:tabular-nums;">${c.balance.toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+      <td>${new Date(c.modified).toLocaleString()}</td>
+    `;
+    tr.addEventListener("click", () => {
+      document.querySelectorAll("#cust-rows tr").forEach(r => r.classList.remove("selected"));
+      tr.classList.add("selected");
+    });
+    tbody.appendChild(tr);
+  });
+  document.getElementById("row-count").textContent = customers.length;
+
+  // ====== API panel ======
+  const apiBody = customers.map(c => ({
+    wbnk_customerid: c.id,
+    fullname: c.name,
+    accountnumber: c.account,
+    segment: c.segment,
+    branch: c.branch,
+    mgr: c.mgr,
+    registered_balance: c.balance,
+    modifiedon: c.modified
+  }));
+  const apiResponse = {
+    "@odata.context": "https://wonderlandbank.crm.dynamics.com/api/data/v9.2/$metadata#wbnk_customers",
+    "@odata.count": apiBody.length,
+    "value": apiBody
+  };
+
+  // Syntax highlight JSON
+  function hiJson(obj) {
+    const json = JSON.stringify(obj, null, 2)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return json.replace(
+      /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?([eE][+-]?\d+)?)/g,
+      m => {
+        let cls = "json-num";
+        if (/^"/.test(m)) cls = /:$/.test(m) ? "json-key" : "json-str";
+        else if (/true|false/.test(m)) cls = "json-bool";
+        else if (/null/.test(m)) cls = "json-null";
+        return `<span class="${cls}">${m}</span>`;
+      }
+    );
+  }
+  document.getElementById("api-json").innerHTML = hiJson(apiResponse);
+
+  function togglePanel() {
+    document.getElementById("api-panel").classList.toggle("open");
+  }
+  function downloadJson() {
+    const blob = new Blob([JSON.stringify(apiResponse, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "wbnk_customers_2026-04-22.json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  }
+  function copyJson() {
+    navigator.clipboard.writeText(JSON.stringify(apiResponse, null, 2));
+  }
+
+  // Hash deep-link: #api opens API panel
+  if ((location.hash || "").toLowerCase() === "#api") togglePanel();
+</script>
+</body>
+</html>

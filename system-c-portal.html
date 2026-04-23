@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CheshirePay Partner Portal</title>
+<style>
+  :root {
+    --brand: #6b2d8c;
+    --brand-dark: #4a1e63;
+    --accent: #e91e88;
+    --bg: #f4f1f8;
+    --card: #ffffff;
+    --text: #2a1a3a;
+    --muted: #7a6a8a;
+    --border: #e0d5eb;
+    --ok: #2f9e44;
+    --warn: #e67700;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* ======== Top nav ======== */
+  .navbar {
+    background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
+    color: #fff;
+    padding: 0 32px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 18px; letter-spacing: 0.3px; }
+  .brand .logo {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ff9ed5, #e91e88 60%, #6b2d8c);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.4);
+  }
+  .nav-right { display: flex; align-items: center; gap: 18px; font-size: 14px; }
+  .nav-right .user-chip {
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-right .avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #fff; color: var(--brand); font-weight: 700;
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
+  }
+
+  /* ======== Login ======== */
+  .login-wrap { display: none; min-height: calc(100vh - 56px); align-items: center; justify-content: center; padding: 40px 20px; }
+  .login-wrap.active { display: flex; }
+  .login-card {
+    background: var(--card);
+    padding: 40px 44px;
+    border-radius: 12px;
+    width: 100%; max-width: 420px;
+    box-shadow: 0 10px 40px rgba(75,30,99,0.15);
+    border: 1px solid var(--border);
+  }
+  .login-card h1 { margin: 0 0 6px; font-size: 24px; color: var(--brand-dark); }
+  .login-card p.sub { margin: 0 0 28px; color: var(--muted); font-size: 14px; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  .field input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(107,45,140,0.15);
+  }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 20px;
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--brand-dark); }
+  .btn.block { width: 100%; padding: 12px; }
+  .btn.secondary { background: #fff; color: var(--brand); border: 1px solid var(--brand); }
+  .btn.secondary:hover { background: #f4eaf9; }
+
+  .hint {
+    margin-top: 18px;
+    padding: 10px 12px;
+    background: #fff8e1;
+    border-left: 3px solid var(--warn);
+    font-size: 12px;
+    color: #6a4c00;
+    border-radius: 4px;
+  }
+  .err {
+    margin-top: 12px;
+    color: #c62828;
+    font-size: 13px;
+    display: none;
+  }
+  .err.show { display: block; }
+
+  /* ======== Dashboard ======== */
+  .dash-wrap { display: none; padding: 32px 40px; max-width: 1200px; margin: 0 auto; }
+  .dash-wrap.active { display: block; }
+
+  .breadcrumb { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+  .page-title { font-size: 26px; font-weight: 600; margin: 0 0 4px; color: var(--brand-dark); }
+  .page-sub { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .stat-card .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 6px; }
+  .stat-card .val { font-size: 24px; font-weight: 700; color: var(--brand-dark); }
+  .stat-card .delta { font-size: 12px; color: var(--ok); margin-top: 4px; }
+  .stat-card .delta.warn { color: var(--warn); }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    background: #faf7fd;
+  }
+  .panel-header h2 { margin: 0; font-size: 16px; color: var(--brand-dark); }
+  .panel-body { padding: 20px; }
+
+  table.reports {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  table.reports th {
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    padding: 12px 20px;
+    background: #faf7fd;
+    border-bottom: 1px solid var(--border);
+  }
+  table.reports td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.reports tr:last-child td { border-bottom: none; }
+  table.reports tr:hover { background: #fbf8fe; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .badge.ready { background: #e6f4ea; color: var(--ok); }
+  .badge.new { background: #fdecf4; color: var(--accent); }
+  .badge.old { background: #eee; color: #666; }
+
+  .file-icon {
+    display: inline-block;
+    width: 28px; height: 32px;
+    background: #e53935;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 32px;
+    border-radius: 3px;
+    margin-right: 10px;
+    vertical-align: middle;
+    position: relative;
+  }
+  .file-icon::after {
+    content: "";
+    position: absolute; top: 0; right: 0;
+    border: 4px solid transparent;
+    border-top-color: #fff;
+    border-right-color: #fff;
+  }
+
+  .download-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+  }
+  .download-btn:hover { background: var(--brand-dark); }
+  .download-btn:disabled { background: #bbb; cursor: not-allowed; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: #2a1a3a;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+    font-size: 14px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  .footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 20px;
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================ NAVBAR ================ -->
+<div class="navbar">
+  <div class="brand">
+    <div class="logo"></div>
+    <span>CheshirePay&nbsp;<span style="opacity:0.7;font-weight:400;">| Partner Portal</span></span>
+  </div>
+  <div class="nav-right" id="nav-right-guest">
+    <span style="opacity:0.8;">Need help? support@cheshirepay.com</span>
+  </div>
+  <div class="nav-right" id="nav-right-user" style="display:none;">
+    <span style="opacity:0.85;">Wonderland Bank Corp.</span>
+    <div class="user-chip">
+      <div class="avatar">A</div>
+      <span>alice.liddell</span>
+    </div>
+    <a href="#" id="logout-link" style="color:#fff;opacity:0.85;text-decoration:none;font-size:13px;">Sign out</a>
+  </div>
+</div>
+
+<!-- ================ LOGIN ================ -->
+<div class="login-wrap active" id="login-wrap">
+  <div class="login-card">
+    <h1>Sign in</h1>
+    <p class="sub">Access your settlement reports and payment data</p>
+
+    <form id="login-form" autocomplete="off">
+      <div class="field">
+        <label for="email">Email or username</label>
+        <input type="text" id="email" value="alice.liddell@wonderlandbank.co" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="pw">Password</label>
+        <input type="password" id="pw" placeholder="Enter your password">
+      </div>
+      <div class="field">
+        <label for="mid">Merchant ID</label>
+        <input type="text" id="mid" value="WBNK-MERCH-0042" spellcheck="false">
+      </div>
+      <button type="submit" class="btn block">Sign in</button>
+      <div class="err" id="err-msg">Incorrect password. Try <b>cheshire123</b> for this demo.</div>
+    </form>
+
+    <div class="hint">
+      <b>Demo credentials:</b> any email / password <code>cheshire123</code> / any Merchant ID.
+    </div>
+  </div>
+</div>
+
+<!-- ================ DASHBOARD ================ -->
+<div class="dash-wrap" id="dash-wrap">
+  <div class="breadcrumb">Home &nbsp;›&nbsp; Reports &nbsp;›&nbsp; Daily Settlement</div>
+  <h1 class="page-title">Daily Settlement Reports</h1>
+  <p class="page-sub">Merchant: <b>WBNK-MERCH-0042</b> &middot; Wonderland Bank Corp. &middot; Time zone: UTC</p>
+
+  <div class="cards">
+    <div class="stat-card">
+      <div class="lbl">Yesterday's Volume</div>
+      <div class="val">$ 387,420.18</div>
+      <div class="delta">▲ 4.2% vs prior day</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl">Transactions</div>
+      <div class="val">1,284</div>
+      <div class="delta">▲ 31 vs prior day</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl">Chargebacks</div>
+      <div class="val">2</div>
+      <div class="delta warn">▲ 1 vs prior day</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl">Net Settlement</div>
+      <div class="val">$ 381,104.55</div>
+      <div class="delta">Wire scheduled 15:00 UTC</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Available Reports</h2>
+      <div>
+        <button class="btn secondary" onclick="alert('Demo: filters not wired up.')">Filter</button>
+      </div>
+    </div>
+    <table class="reports">
+      <thead>
+        <tr>
+          <th>Report</th>
+          <th>Period</th>
+          <th>Generated</th>
+          <th>Size</th>
+          <th>Status</th>
+          <th style="text-align:right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <span class="file-icon">PDF</span>
+            <b>Daily Settlement Report</b><br>
+            <span style="color:var(--muted);font-size:12px;">settlement_2026-04-22.pdf</span>
+          </td>
+          <td>2026-04-22</td>
+          <td>2026-04-23 03:00 UTC</td>
+          <td>148 KB</td>
+          <td><span class="badge new">New</span></td>
+          <td style="text-align:right;">
+            <button class="download-btn" onclick="downloadPdf()">Download</button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="file-icon">PDF</span>
+            <b>Daily Settlement Report</b><br>
+            <span style="color:var(--muted);font-size:12px;">settlement_2026-04-21.pdf</span>
+          </td>
+          <td>2026-04-21</td>
+          <td>2026-04-22 03:00 UTC</td>
+          <td>146 KB</td>
+          <td><span class="badge ready">Available</span></td>
+          <td style="text-align:right;">
+            <button class="download-btn" onclick="downloadPdf()">Download</button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="file-icon">PDF</span>
+            <b>Daily Settlement Report</b><br>
+            <span style="color:var(--muted);font-size:12px;">settlement_2026-04-20.pdf</span>
+          </td>
+          <td>2026-04-20</td>
+          <td>2026-04-21 03:00 UTC</td>
+          <td>151 KB</td>
+          <td><span class="badge old">Archived</span></td>
+          <td style="text-align:right;">
+            <button class="download-btn" onclick="downloadPdf()">Download</button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="file-icon">PDF</span>
+            <b>Weekly Reconciliation Summary</b><br>
+            <span style="color:var(--muted);font-size:12px;">recon_week_2026-W16.pdf</span>
+          </td>
+          <td>Week 16</td>
+          <td>2026-04-20 06:00 UTC</td>
+          <td>312 KB</td>
+          <td><span class="badge ready">Available</span></td>
+          <td style="text-align:right;">
+            <button class="download-btn" onclick="downloadPdf()">Download</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    © 2026 CheshirePay Ltd. &middot; A fictional payment processor for demo purposes. &middot; v3.11.2
+  </div>
+</div>
+
+<div class="toast" id="toast">Downloading settlement_2026-04-22.pdf…</div>
+
+<script>
+  // ---- Login flow ----
+  const loginWrap = document.getElementById('login-wrap');
+  const dashWrap = document.getElementById('dash-wrap');
+  const navGuest = document.getElementById('nav-right-guest');
+  const navUser  = document.getElementById('nav-right-user');
+  const errMsg = document.getElementById('err-msg');
+
+  function goDash(){
+    loginWrap.classList.remove('active');
+    dashWrap.classList.add('active');
+    navGuest.style.display = 'none';
+    navUser.style.display = 'flex';
+  }
+
+  // Deep-link via URL hash: #dash skips login for demo replays
+  if ((location.hash || '').toLowerCase() === '#dash') goDash();
+
+  document.getElementById('login-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const pw = document.getElementById('pw').value;
+    if (pw === 'cheshire123') {
+      loginWrap.classList.remove('active');
+      dashWrap.classList.add('active');
+      navGuest.style.display = 'none';
+      navUser.style.display = 'flex';
+    } else {
+      errMsg.classList.add('show');
+    }
+  });
+
+  document.getElementById('logout-link').addEventListener('click', e => {
+    e.preventDefault();
+    dashWrap.classList.remove('active');
+    loginWrap.classList.add('active');
+    navUser.style.display = 'none';
+    navGuest.style.display = 'flex';
+    document.getElementById('pw').value = '';
+    errMsg.classList.remove('show');
+  });
+
+  // ---- Toast ----
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2800);
+  }
+
+  // ---- Generate a real PDF on the fly ----
+  // Minimal hand-crafted PDF 1.4 with one page of text.
+  function buildPdfBytes() {
+    const lines = [
+      "CheshirePay  -  Daily Settlement Report",
+      "=========================================",
+      "",
+      "Merchant:       WBNK-MERCH-0042  (Wonderland Bank Corp.)",
+      "Report Date:    2026-04-22",
+      "Generated:      2026-04-23 03:00 UTC",
+      "Currency:       USD",
+      "",
+      "SUMMARY",
+      "-----------------------------------------",
+      "Gross Volume:          USD  387,420.18",
+      "Refunds:               USD   -4,215.63",
+      "Chargebacks:           USD   -2,100.00",
+      "Processing Fees:       USD      -0.00",
+      "Net Settlement:        USD  381,104.55",
+      "Transactions:          1,284",
+      "",
+      "RECONCILIATION DETAIL  (partial)",
+      "-----------------------------------------",
+      "TXN-ID        CUSTOMER    AMOUNT       STATUS",
+      "CP78451001    C00017842    5,200.00    SETTLED",
+      "CP78451002    C00019210    1,900.00    SETTLED",
+      "CP78451003    C00022114   15,000.00    SETTLED",
+      "CP78451004    C00028701    2,800.00    SETTLED",
+      "CP78451005    C00031005      980.00    SETTLED",
+      "CP78451006    C00040122   12,000.00    SETTLED",
+      "CP78451007    C00045011    7,800.00    HELD (REVIEW)",
+      "...",
+      "",
+      "Wire transfer scheduled: 2026-04-23 15:00 UTC",
+      "Destination: Wonderland Bank Corp. a/c ****-2200",
+      "",
+      "This is a fictional report generated for demo purposes."
+    ];
+
+    // Build content stream: a single Tj per line using T* to move down.
+    let stream = "BT\n/F1 10 Tf\n72 770 Td\n12 TL\n";
+    lines.forEach((ln, i) => {
+      // Escape parentheses and backslashes for PDF string literal
+      const safe = ln.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+      if (i === 0) stream += `(${safe}) Tj\n`;
+      else stream += `T*\n(${safe}) Tj\n`;
+    });
+    stream += "ET";
+
+    const objects = [];
+    objects[1] = "<< /Type /Catalog /Pages 2 0 R >>";
+    objects[2] = "<< /Type /Pages /Kids [3 0 R] /Count 1 >>";
+    objects[3] = "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>";
+    objects[4] = `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;
+    objects[5] = "<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>";
+
+    let pdf = "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";
+    const offsets = [0];
+    for (let i = 1; i < objects.length; i++) {
+      offsets[i] = pdf.length;
+      pdf += `${i} 0 obj\n${objects[i]}\nendobj\n`;
+    }
+    const xrefOffset = pdf.length;
+    pdf += `xref\n0 ${objects.length}\n`;
+    pdf += "0000000000 65535 f \n";
+    for (let i = 1; i < objects.length; i++) {
+      pdf += String(offsets[i]).padStart(10, '0') + " 00000 n \n";
+    }
+    pdf += `trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+    // Convert to byte array (Latin-1 safe)
+    const bytes = new Uint8Array(pdf.length);
+    for (let i = 0; i < pdf.length; i++) bytes[i] = pdf.charCodeAt(i) & 0xff;
+    return bytes;
+  }
+
+  function downloadPdf() {
+    toast("Downloading settlement_2026-04-22.pdf…");
+    const bytes = buildPdfBytes();
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'settlement_2026-04-22.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+  }
+</script>
+</body>
+</html>
