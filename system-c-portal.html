@@ -535,17 +535,8 @@
   }
 
   function downloadPdf() {
-    toast("Downloading settlement_2026-05-04.pdf…");
-    const bytes = buildPdfBytes();
-    const blob = new Blob([bytes], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'settlement_2026-05-04.pdf';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+    toast("Opening settlement_2026-05-04.pdf…");
+    window.open('settlement_2026-05-04.html', '_blank');
   }
 </script>
 </body>
