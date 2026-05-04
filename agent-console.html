@@ -447,8 +447,8 @@
   <div class="timeline-panel">
     <div class="tl-head">
       <div>
-        <h1>Run log · 2026-05-06</h1>
-        <div class="meta" id="run-meta">Scheduled run · reconciliation for prior business day (2026-05-05)</div>
+        <h1>Run log · 2026-05-05</h1>
+        <div class="meta" id="run-meta">Scheduled run · reconciliation for prior business day (2026-05-04)</div>
       </div>
       <div class="controls">
         <button class="btn" id="btn-reset">↻ Reset</button>
@@ -515,7 +515,7 @@
           <p style="margin-top:12px;">You saved roughly <b>2h 50m</b> of typing this morning. Enjoy your coffee. 🐾</p>
         </div>
         <div class="msg-actions">
-          <a class="msg-btn primary" href="cheshire_reconciliation_2026-05-05.xlsx" download>📎 cheshire_reconciliation_2026-05-05.xlsx</a>
+          <a class="msg-btn primary" href="cheshire_reconciliation_2026-05-04.xlsx" download>📎 cheshire_reconciliation_2026-05-04.xlsx</a>
           <button class="msg-btn" onclick="alert('Demo — would acknowledge the report.')">✓ Acknowledge</button>
           <button class="msg-btn" onclick="alert('Demo — would escalate to ops.')">↗ Escalate</button>
         </div>
@@ -529,7 +529,7 @@
 // ============== Timeline script ==============
 const steps = [
   { t: "08:00:00", type: "think", tool: null,    title: "Triggered by schedule",
-    detail: "Running daily reconciliation for prior business day <code>2026-05-05</code>." },
+    detail: "Running daily reconciliation for prior business day <code>2026-05-04</code>." },
   { t: "08:00:04", type: "sys-a", tool: "tn3270", title: "Launching TN3270 emulator",
     detail: "Connecting to <code>wbnk-mvs.wonderland.bank.corp:23</code> — no API available for core banking." },
   { t: "08:00:11", type: "sys-a", tool: "tn3270", title: "Signed on as ALICE",
@@ -543,7 +543,7 @@ const steps = [
   { t: "08:00:56", type: "sys-c", tool: "portal", title: "Signed in with merchant credentials",
     detail: "Vault-resolved secret used; merchant <code>WBNK-MERCH-0042</code>." },
   { t: "08:01:08", type: "sys-c", tool: "portal", title: "Downloaded settlement PDF",
-    detail: "<code>settlement_2026-05-05.pdf</code> · 148 KB · 8 settlement rows." },
+    detail: "<code>settlement_2026-05-04.pdf</code> · 148 KB · 8 settlement rows." },
   { t: "08:01:22", type: "sys-c", tool: "portal", title: "Extracted settlement table from PDF",
     detail: "7 SETTLED, 1 HELD (REVIEW) for customer C00045011." },
   { t: "08:01:31", type: "sys-b", tool: "api",    title: "Calling Dynamics 365 Web API",
@@ -557,7 +557,7 @@ const steps = [
   { t: "08:02:31", type: "think", tool: null,    title: "Mismatch #3 detected",
     detail: "C00028701 (Queen of Hearts) — D365 registered_balance 500.00 above mainframe latest balance." },
   { t: "08:03:15", type: "sys-b", tool: "excel",  title: "Writing reconciliation workbook",
-    detail: "4 sheets · <code>cheshire_reconciliation_2026-05-05.xlsx</code> · Mismatches sheet highlights all 3 items." },
+    detail: "4 sheets · <code>cheshire_reconciliation_2026-05-04.xlsx</code> · Mismatches sheet highlights all 3 items." },
   { t: "08:04:17", type: "teams", tool: "teams",  title: "Posted summary to Alice in Teams",
     detail: "Message delivered with mismatch cards + attached workbook + action buttons." },
   { t: "08:04:18", type: "ok",    tool: null,    title: "Run complete",

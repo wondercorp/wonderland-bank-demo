@@ -489,16 +489,16 @@
 <script>
   // ====== Customer data (matches System A TRANLIST customer IDs) ======
   const customers = [
-    { id: "C00017842", name: "Mad Hatter Holdings LLC",     account: "1001-0025-7731", segment: "Premium", branch: "001 HQ",    mgr: "B. Bandersnatch", balance: 48310.22,  modified: "2026-05-05T14:12Z" },
-    { id: "C00019210", name: "White Rabbit Courier Co.",    account: "1001-0041-2200", segment: "Standard", branch: "001 HQ",   mgr: "T. Tweedle",      balance: 15458.45,  modified: "2026-05-05T11:02Z" },
-    { id: "C00022114", name: "Caterpillar Capital Partners",account: "1001-0088-4410", segment: "VIP",     branch: "007 Mirror", mgr: "C. Cheshire",    balance: 216455.00, modified: "2026-05-05T13:10Z" },
-    { id: "C00028701", name: "Queen of Hearts Confectionery",account:"1001-0105-9920", segment: "Premium", branch: "003 Downtown",mgr:"D. Dormouse",    balance: 9270.10,   modified: "2026-05-05T15:11Z" },
-    { id: "C00031005", name: "March Hare Logistics",        account: "1001-0202-1188", segment: "Standard", branch: "003 Downtown",mgr:"T. Tweedle",    balance: 6420.00,   modified: "2026-05-05T10:18Z" },
-    { id: "C00034520", name: "Looking-Glass Consulting Ltd",account: "1001-0311-0077", segment: "Premium", branch: "007 Mirror", mgr: "C. Cheshire",    balance: 21500.00,  modified: "2026-05-05T16:52Z" },
-    { id: "C00038915", name: "Jabberwock Manufacturing GmbH",account:"1001-0420-5533", segment: "Standard", branch: "012 Tulgey", mgr: "B. Bandersnatch", balance: 42010.77, modified: "2026-05-05T14:02Z" },
-    { id: "C00040122", name: "Walrus & Carpenter Trading",  account: "1001-0511-7788", segment: "VIP",     branch: "001 HQ",     mgr: "D. Dormouse",    balance: 88044.00,  modified: "2026-05-05T14:35Z" },
-    { id: "C00042330", name: "Oyster Bay Seafood Inc.",     account: "1001-0620-1122", segment: "Standard", branch: "012 Tulgey", mgr: "T. Tweedle",     balance: 4700.00,   modified: "2026-05-05T15:58Z" },
-    { id: "C00045011", name: "Cheshire Cat Ventures SA",    account: "1001-0715-3344", segment: "VIP",     branch: "007 Mirror", mgr: "C. Cheshire",    balance: 102200.00, modified: "2026-05-05T16:30Z" }
+    { id: "C00017842", name: "Mad Hatter Holdings LLC",     account: "1001-0025-7731", segment: "Premium", branch: "001 HQ",    mgr: "B. Bandersnatch", balance: 48310.22,  modified: "2026-05-04T14:12Z" },
+    { id: "C00019210", name: "White Rabbit Courier Co.",    account: "1001-0041-2200", segment: "Standard", branch: "001 HQ",   mgr: "T. Tweedle",      balance: 15458.45,  modified: "2026-05-04T11:02Z" },
+    { id: "C00022114", name: "Caterpillar Capital Partners",account: "1001-0088-4410", segment: "VIP",     branch: "007 Mirror", mgr: "C. Cheshire",    balance: 216455.00, modified: "2026-05-04T13:10Z" },
+    { id: "C00028701", name: "Queen of Hearts Confectionery",account:"1001-0105-9920", segment: "Premium", branch: "003 Downtown",mgr:"D. Dormouse",    balance: 9270.10,   modified: "2026-05-04T15:11Z" },
+    { id: "C00031005", name: "March Hare Logistics",        account: "1001-0202-1188", segment: "Standard", branch: "003 Downtown",mgr:"T. Tweedle",    balance: 6420.00,   modified: "2026-05-04T10:18Z" },
+    { id: "C00034520", name: "Looking-Glass Consulting Ltd",account: "1001-0311-0077", segment: "Premium", branch: "007 Mirror", mgr: "C. Cheshire",    balance: 21500.00,  modified: "2026-05-04T16:52Z" },
+    { id: "C00038915", name: "Jabberwock Manufacturing GmbH",account:"1001-0420-5533", segment: "Standard", branch: "012 Tulgey", mgr: "B. Bandersnatch", balance: 42010.77, modified: "2026-05-04T14:02Z" },
+    { id: "C00040122", name: "Walrus & Carpenter Trading",  account: "1001-0511-7788", segment: "VIP",     branch: "001 HQ",     mgr: "D. Dormouse",    balance: 88044.00,  modified: "2026-05-04T14:35Z" },
+    { id: "C00042330", name: "Oyster Bay Seafood Inc.",     account: "1001-0620-1122", segment: "Standard", branch: "012 Tulgey", mgr: "T. Tweedle",     balance: 4700.00,   modified: "2026-05-04T15:58Z" },
+    { id: "C00045011", name: "Cheshire Cat Ventures SA",    account: "1001-0715-3344", segment: "VIP",     branch: "007 Mirror", mgr: "C. Cheshire",    balance: 102200.00, modified: "2026-05-04T16:30Z" }
   ];
 
   // ====== Render table ======
@@ -572,7 +572,7 @@
     const blob = new Blob([JSON.stringify(apiResponse, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "wbnk_customers_2026-05-05.json";
+    a.download = "wbnk_customers_2026-05-04.json";
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
   }

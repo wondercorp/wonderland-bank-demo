@@ -160,7 +160,7 @@ based 3270 terminal emulator hosted at the URL below.
 
 ```json
 {
-  "run_date": "2026-05-05",
+  "run_date": "2026-05-04",
   "branch": "001",
   "currency": "USD",
   "rows": [
@@ -226,7 +226,7 @@ are auto-filled by the browser profile - you do not handle them directly.
 3. Click the "Sign in" button.
 4. The dashboard loads with the "Daily Settlement Reports" table.
    Locate the row whose filename matches `run_date`
-   (e.g. settlement_2026-05-05.pdf for run_date 2026-05-05).
+   (e.g. settlement_2026-05-04.pdf for run_date 2026-05-04).
 5. Click the "Download" button on that row. The PDF saves to the
    default Downloads folder.
 6. Open the downloaded PDF and extract the settlement table. Each row
@@ -240,7 +240,7 @@ are auto-filled by the browser profile - you do not handle them directly.
 
 ```json
 {
-  "run_date": "2026-05-05",
+  "run_date": "2026-05-04",
   "merchant_id": "WBNK-MERCH-0042",
   "currency": "USD",
   "summary": {
@@ -336,7 +336,7 @@ description into the corresponding tool's **Description** field.
 
 ## 5. Suggested test prompts
 
-1. *"Run reconciliation for 2026-05-05."*
+1. *"Run reconciliation for 2026-05-04."*
 2. *"Why did you flag mismatch #2?"*
 3. *"Show me yesterday's TRANLIST."*
 4. *"Are there any HELD items I need to release before 3 PM?"*
