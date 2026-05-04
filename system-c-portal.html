@@ -346,10 +346,10 @@
           <td>
             <span class="file-icon">PDF</span>
             <b>Daily Settlement Report</b><br>
-            <span style="color:var(--muted);font-size:12px;">settlement_2026-04-22.pdf</span>
+            <span style="color:var(--muted);font-size:12px;">settlement_2026-05-05.pdf</span>
           </td>
-          <td>2026-04-22</td>
-          <td>2026-04-23 03:00 UTC</td>
+          <td>2026-05-05</td>
+          <td>2026-05-06 03:00 UTC</td>
           <td>148 KB</td>
           <td><span class="badge new">New</span></td>
           <td style="text-align:right;">
@@ -363,7 +363,7 @@
             <span style="color:var(--muted);font-size:12px;">settlement_2026-04-21.pdf</span>
           </td>
           <td>2026-04-21</td>
-          <td>2026-04-22 03:00 UTC</td>
+          <td>2026-05-05 03:00 UTC</td>
           <td>146 KB</td>
           <td><span class="badge ready">Available</span></td>
           <td style="text-align:right;">
@@ -407,7 +407,7 @@
   </div>
 </div>
 
-<div class="toast" id="toast">Downloading settlement_2026-04-22.pdf…</div>
+<div class="toast" id="toast">Downloading settlement_2026-05-05.pdf…</div>
 
 <script>
   // ---- Login flow ----
@@ -466,8 +466,8 @@
       "=========================================",
       "",
       "Merchant:       WBNK-MERCH-0042  (Wonderland Bank Corp.)",
-      "Report Date:    2026-04-22",
-      "Generated:      2026-04-23 03:00 UTC",
+      "Report Date:    2026-05-05",
+      "Generated:      2026-05-06 03:00 UTC",
       "Currency:       USD",
       "",
       "SUMMARY",
@@ -491,7 +491,7 @@
       "CP78451007    C00045011    7,800.00    HELD (REVIEW)",
       "...",
       "",
-      "Wire transfer scheduled: 2026-04-23 15:00 UTC",
+      "Wire transfer scheduled: 2026-05-06 15:00 UTC",
       "Destination: Wonderland Bank Corp. a/c ****-2200",
       "",
       "This is a fictional report generated for demo purposes."
@@ -535,13 +535,13 @@
   }
 
   function downloadPdf() {
-    toast("Downloading settlement_2026-04-22.pdf…");
+    toast("Downloading settlement_2026-05-05.pdf…");
     const bytes = buildPdfBytes();
     const blob = new Blob([bytes], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'settlement_2026-04-22.pdf';
+    a.download = 'settlement_2026-05-05.pdf';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
