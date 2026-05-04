@@ -535,14 +535,17 @@
   }
 
   function downloadPdf() {
-    toast("Opening settlement_2026-05-04.pdf…");
+    toast("Downloading settlement_2026-05-04.pdf…");
     const bytes = buildPdfBytes();
-    // Wrap in a File so the browser uses the filename when the user saves
-    // from the new tab (Save As defaults to this name in Chromium / Edge).
-    const file = new File([bytes], 'settlement_2026-05-04.pdf', { type: 'application/pdf' });
-    const url = URL.createObjectURL(file);
-    window.open(url, '_blank');
-    setTimeout(()=>URL.revokeObjectURL(url), 60000);
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'settlement_2026-05-04.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
   }
 </script>
 </body>
